@@ -1,0 +1,105 @@
+{% load static %}
+{% load humanize %}
+<script src="{% static 'js/sim_da_ban.js' %}"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Quản lý Sim Đã Bán</title>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Quản lý Sim Đã Bán</h1>
+
+        <!-- Form lọc -->
+        <form method="GET" action="">
+            <div class="row mb-3">
+                <!-- Lọc theo tháng -->
+                <div class="col-md-3">
+                    <label for="thang" class="form-label">Tháng</label>
+                    <input type="month" name="thang" id="thang" class="form-control" value="{{ request.GET.thang }}">
+                </div>
+
+                <!-- Lọc theo người bán -->
+                <div class="col-md-3">
+                    <label for="nguoi_ban" class="form-label">Người bán</label>
+                    <input type="text" name="nguoi_ban" id="nguoi_ban" class="form-control" value="{{ request.GET.nguoi_ban }}">
+                </div>
+
+                <!-- Lọc theo ngày bán -->
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label">Ngày bắt đầu</label>
+                    <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label">Ngày kết thúc</label>
+                    <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.GET.end_date }}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Lọc</button>
+        </form>
+
+        <!-- Bảng hiển thị danh sách sim đã bán -->
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Số thứ tự</th>
+                    <th>Số thuê bao</th>
+                    <th>Giá thu gốc</th>
+                    <th>Giá chiết khấu</th>
+                    <th>Phí giao dịch</th>
+                    <th>Thực thu</th>
+                    <th>Ngày bán</th>
+                    <th>Người bán</th>
+                    <th>Nhà mạng</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sim in page_obj %}
+                <tr>
+                    <td>{{ sim.so_thu_tu }}</td>
+                    <td>{{ sim.so_thue_bao }}</td>
+                    <td>{{ sim.gia_thu_goc|floatformat:0|intcomma }}</td>
+                    <td>{{ sim.gia_chiet_khau|floatformat:0|intcomma }}</td>
+                    <td>{{ sim.phi_giao_dich|floatformat:0|intcomma }}</td>
+                    <td>{{ sim.thuc_thu|floatformat:0|intcomma }}</td>
+                    <td>{{ sim.ngay_ban|date:"d/m/Y" }}</td>
+                    <td>{{ sim.nguoi_ban }}</td>
+                    <td>{{ sim.nha_mang }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9">Không có dữ liệu sim đã bán.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><strong>Tổng giá chiết khấu:</strong> {{ total_chiet_khau|floatformat:0|intcomma }}</p>
+        <p><strong>Tổng thực thu:</strong> {{ total_thuc_thu|floatformat:0|intcomma }}</p>
+        <!-- Phân trang -->
+        <div id="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+                
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+        
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
